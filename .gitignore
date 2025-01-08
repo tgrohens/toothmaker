@@ -1,6 +1,11 @@
+# Compiled modules
+*.mod
+
+# Executables
 runt.e
 runt.e.debug
 
+# Example output
 *.dad
 *.off
 *.txt
