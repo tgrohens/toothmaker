@@ -213,7 +213,7 @@ al: do icentre=1,ncels
     xx=x+csu*la ; yy=y+ssu*la ; j=1 ; jj=4 ; call posar
     xx=x+csd*la ; yy=y+ssd*la ; j=2 ; jj=5 ; call posar
     xx=x+cst*la ; yy=y+sst*la ; j=3 ; jj=6 ; call posar
-    xx=x+csq*la ; yy=y+ssq*la ; j=4            ; jj=1 ; call posar
+    xx=x+csq*la ; yy=y+ssq*la ; j=4 ; jj=1 ; call posar
     xx=x+csc*la ; yy=y+ssc*la ; j=5 ; jj=2 ; call posar
     xx=x+css*la ; yy=y+sss*la ; j=6 ; jj=3 ; call posar
 
@@ -889,19 +889,41 @@ subroutine pushingnovei
   real*8, allocatable :: persu(:,:),cpersu(:,:)   !arbitrari  FACTOR CRITIC DE OPTIMITZACIO
   integer,allocatable :: index(:)
   integer conta,espai,espaia
+  integer i_vois, i_cel, voisin_cour
+  logical, allocatable :: est_voisin(:,:)
   espai=20
   allocate(persu(espai,3))
   allocate(index(espai))
+  allocate(est_voisin(ncels,ncels))
   !rotllu finite elements
-!  hvmalla=0.
+  !hvmalla=0.
+
+  ! print "(A, I0)", "iteration: ", temps
+  ! print "(A, I0)", "number of cells: ", ncels
+
+  ! Instead of looping over the vei array for each pair inside the loop in O(N^3),
+  ! do it once here for all in O(N^2).
+  est_voisin = .false.
+  do i_vois = 1, nvmax
+    do i_cel = 1, ncels
+      voisin_cour = vei(i_cel, i_vois)
+      if (voisin_cour > 0 .and. voisin_cour <= ncels) then
+        est_voisin(i_cel, voisin_cour) = .true.
+      end if
+    end do
+  end do
+
   do i=1,ncels
 !    if (q2d(i,1)>=1.) cycle
     ua=malla(i,1) ; ub=malla(i,2) ; uc=malla(i,3)
     persu=0. ; conta=0
 gg: do ii=1,ncels
-      if (ii==i) cycle 
-      do j=1,nvmax ; if (vei(i,j)==ii) cycle gg ; end do
-!      ux=malla(ii,1) ; uy=malla(ii,2) ; uz=malla(ii,3)          
+
+      if (ii==i .or. est_voisin(i, ii)) then
+        cycle
+      end if
+
+!      ux=malla(ii,1) ; uy=malla(ii,2) ; uz=malla(ii,3)g
       ux=malla(ii,1)-ua 
       if (ux>0.14D1) cycle
       uy=malla(ii,2)-ub 
