@@ -8,4 +8,5 @@ runt.e.debug
 # Example output
 *.dad
 *.off
-*.txt
+*_.txt
+*progressbar*
