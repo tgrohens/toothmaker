@@ -1,4 +1,4 @@
-SOURCES=$(wildcard *.f90)
+SOURCES=coreop2d.f90 esclec.f90 toothmaker.f90
 
 
 runt.e: $(SOURCES)
