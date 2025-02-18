@@ -73,7 +73,6 @@ ncz=4
 call ciinicial
 call llegirinicial
 call dime
-!call referci
 
 !parapo=parap(:,1)
 !Programa
@@ -112,8 +111,6 @@ call dime
     nfoff=nff(1:26)//"_"//".off"
     nfes=nff(1:26)//"_"//".txt"
     nfpro=nfpro(1:15)//"_progressbar"//".txt"
-
-!    call referci
 
     temps=0
 
