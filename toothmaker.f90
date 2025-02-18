@@ -16,7 +16,6 @@ integer :: winid, menuid
 integer pa,nstep
 real*8    step
 integer   sstep,nt,pao
-real*8    parapo(32)
 character*12 cu,cd,ct,cq
 character*12 acu,acd,act,acq
 character*1 ccu,ccd,cct,ccq
@@ -34,11 +33,6 @@ integer sis,siss
 integer ancels
 
 integer idi,pau,pad,pauu,padd
-
-paras(1)=3 ; paras(2)=4 ;paras(3)=5 ;paras(4)=7 ;paras(5)=8 ;
-paras(6)=9 ; paras(7)=11 ;paras(8)=13 ;paras(9)=14 ;paras(10)=15 ;
-paras(11)=17 ; paras(12)=18 ;paras(13)=19 ;paras(14)=20 ;paras(15)=21 ;
-paras(16)=23 ; paras(17)=27 ;paras(18)=28 ;paras(19)=29 
 
 call getarg(1,cac) !fitxer entrada  !input file
 call getarg(2,cau) !fitxer sortida  !output file
@@ -74,9 +68,7 @@ call ciinicial
 call llegirinicial
 call dime
 
-!parapo=parap(:,1)
 !Programa
-!parap(:,1)=parapo
   ancels=ncels
   call posarparap(1)
   ncels=ancels
@@ -139,14 +131,7 @@ call dime
     call posarparap(1)
     call escriuparatxt
   end do
-!end do
-!end do
 
-parap(:,1)=parapo
-call posarparap(1)
-
-!end do
-!end do
 
 777 print *,"fora"
 end program tresdac
