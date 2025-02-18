@@ -1,7 +1,6 @@
 !module coreop2d is the model itself. It includes the following subroutines
 !      subroutine ciinicial          specifies the default initial conditions
 !      subroutine dime               allocates the matrices for the initial conditions and sets them     
-!      subroutine redime             not in use
 !      subroutine posar              specifies the position of cells in the initial conditions
 !      subroutine calculmarges       calculates the shape of each epithelial cell (this is the position of its margins)
 !      subroutine reaccio_difusio    calculates diffusion of all the molecules between cells
@@ -23,7 +22,7 @@ module coreop2d   !WARNING: optimized version in order not to add
 
 !use opengl_gl
 implicit none
-public :: iteracio,ci,calculmarges,reaccio_difusio,dime,llegirparam,ciinicial
+public :: iteracio,ci,calculmarges,reaccio_difusio,dime,ciinicial
 
 !coreop2d
 real*8, public, allocatable  :: malla(:,:)  ! les posicions dels nodes x,y,z
@@ -324,59 +323,6 @@ call calculmarges
 q3d=0
 end subroutine dime
 
-subroutine redime
-  integer, allocatable :: cv(:,:)
-  real*8 , allocatable :: cmalla(:,:)
-  integer iit
-
-!  ncals=ncels+1
-
-  umelas=1-elas
-
-
-  !alocatacions
-  allocate(cv(ncals,nvmax))
-  allocate(cmalla(ncals,3))
-
-  allocate(malla(ncals,3))
-  allocate(vei(ncals,nvmax))
-  allocate(hmalla(ncals,3))
-  allocate(hvmalla(ncals,3))
-  allocate(marge(ncals,nvmax,8))
-  allocate(knots(ncals))
-  allocate(nveins(ncals))
-  allocate(q2d(ncals,ngg))
-  allocate(q3d(ncals,ncz,ng))
-  allocate(mmap(radi))
-  allocate(mmaa(radi))
-
-  !matrius de visualitzacio
-  allocate(px(ncals)) ; allocate(py(ncals)) ; allocate(pz(ncals))
-
-  ampl=radi*0.75
-
-  !valors de zeros
-  vei=0. ; nveins=0. ; malla=0. ; q2d=0. ; q3d=0. ; knots=0 ; hmalla=0. ; hvmalla=0.
-
-  !valors inicials
-  malla(1,1)=0. ; malla(1,2)=0. ; malla(1,3)=1.
-  nca=1
-end subroutine redime
-
-subroutine referci
-  deallocate (malla) ;  deallocate(q3d)  ; deallocate(px)    ; deallocate(py)     ; deallocate(pz) 
-  deallocate (q2d)   ;  deallocate(marge); deallocate(vei)   ; deallocate(nveins) ; deallocate(hmalla)
-  deallocate(hvmalla);  deallocate(knots) ; deallocate(mmaa) ; deallocate (mmap)
-  call ci 
-!  call iteracio(1)
-end subroutine
-
-subroutine refercid
-  deallocate (malla) ;  deallocate(q3d)  ; deallocate(px) ; deallocate(py)     ; deallocate(pz) 
-  deallocate (q2d)   ;  deallocate(marge); deallocate(vei); deallocate(nveins) ; deallocate(hmalla)
-  deallocate(hvmalla);  deallocate(knots);  deallocate(mmaa) ; deallocate (mmap)
-end subroutine
-
 subroutine posar
 al: do i=1,nca 
       if (i==icentre) cycle al
@@ -388,29 +334,6 @@ vei(icentre,j)=i ; vei(i,jj)=icentre ; nveins(i)=nveins(i)+1 ; nveins(icentre)=n
     nveins(icentre)=nveins(icentre)+1 ; nca=nca+1 ; vei(icentre,j)=nca ; vei(nca,jj)=icentre ; malla(nca,1)=xx ; 
     malla(nca,2)=yy ; malla(nca,3)=1. ; nveins(nca)=nveins(nca)+1
 end subroutine posar
-
-subroutine llegirparam
-  open(1,file="inex/veure27.dad",status='old',iostat=i)
-  !print *,i
-45  read (1,*,err=666,end=777) radi
-  !print *,radi
-  read (1,*,err=666,end=777) tacre,tahor,elas,tadi,crema
-  !print *,tacre,"tacre",tahor,"tahor",elas,"elas",crema,"crema"
-  read (1,*,err=666,end=777) acac,ihac,acaca,ih,acec
-  !print *,acac,"acac",ihac,"ihac",acaca,"acaca",ih,"ih",acec,"acec"
-  read (1,*,err=666,end=777) difq3d
-  !print *,difq3d,"difusions"
-  read (1,*,err=666,end=777) difq2d
-  !print *,difq2d,"difusions 2D"
-  read (1,*,err=666,end=777) bip,bia,bib,bil
-  !print *,bip,bia,bib,bil
-  goto 45
-666  tacre=29D-1  ; tahor=0.1D1 ; acac=0.1D1 ; acaca=1D-3   ; ihac=10D1 ; ih=1D-2
-     difq3d=0.1D1 ; elas=0.8  ; difq2d=1. ; difq3d=1.
-     bip=0.       ; bia=0.      ; bib=0.     ; bil=0.
-     print *,"error de lectura dels fitxer de dades, dades no pillades"
-777 close(1)
-end subroutine llegirparam
 
 
 
@@ -1662,45 +1585,6 @@ erra:   do j=1,nvmax
      end if
 end subroutine
 
-
-subroutine controlz
-integer oncz
-real*8, allocatable :: cq3d(:,:,:)
-  oncz=ncz
-  ncz=ncz+1
-  !print *,oncz,ncz,"ncz"
-  allocate (cq3d(ncals,ncz,ng))
-  cq3d=0
-  cq3d(:,1:oncz,:)=q3d
-  deallocate (q3d)
-  allocate(q3d(ncals,ncz,ng))
-  q3d=cq3d
-  deallocate (cq3d)
-!print *,ncz,"control"
-end subroutine controlz
-
-subroutine vbia
-  real*8 a
-
-  k=0
-  do i=1,ncels
-    do j=1,ncels    
-      if (i==j) cycle
-      b=malla(i,1) ; c=malla(j,1)
-      if (b<0.and.c>0.or.b>0.and.c<0) then
-        c=-c
-        a=sqrt((b-c)**2+(malla(i,2)-malla(j,2))**2+(malla(i,3)-malla(j,3))**2)
-        if (a<1D-5.and.a>9D-16) then 
-          k=1 ; !print *,i,j,a,temps,"dif"
-          !print *,malla(i,1),malla(j,1)
-          !print *,malla(i,2),malla(j,2)  
-          !print *,malla(i,3),malla(j,3)
-        end if
-      end if
-    end do
-  end do
-!  if (k==1) read(*,*)
-end subroutine vbia
 
 subroutine iteracio(tbu)
   integer tbu,ite,io
